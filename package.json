@@ -1,6 +1,6 @@
 {
   "name": "com.volorf.obj-exporter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "displayName": "Obj Exporter",
   "description": "Exports .obj for voxel data",
   "unity": "2019.4",
