@@ -1,0 +1,19 @@
+{
+  "name": "com.volorf.obj-exporter",
+  "version": "1.0.0",
+  "displayName": "Obj Exporter",
+  "description": "Exports .obj for voxel data",
+  "unity": "2019.4",
+  "unityRelease": "7f1",
+  "dependencies": {
+  },
+  "keywords": [
+    "obj",
+    "export"
+  ],
+  "author": {
+    "name": "Oleg Frolov",
+    "email": "olegfrolovdesign@gmail.com",
+    "url": "https://www.olegfrolov.design"
+  }
+}
