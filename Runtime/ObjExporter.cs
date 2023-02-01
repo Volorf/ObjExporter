@@ -88,7 +88,7 @@ namespace Volorf.ObjExporter
 
                 for (int j = 0; j < _points.Length; j++)
                 {
-                    _objData += GetVertex(positions[i] * voxelSize * 2 + _points[j] * voxelSize);
+                    _objData += GetVertex(positions[i] + _points[j] * voxelSize);
                 }
 
                 for (int m = 0; m < _uvs.Length; m++)
