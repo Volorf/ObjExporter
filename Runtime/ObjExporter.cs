@@ -7,7 +7,7 @@ namespace Volorf.ObjExporter
 {
     public class ObjExporter
     {
-        private List<Vector3> _points = new List<Vector3>()
+        private Vector3[] _points = new Vector3[]
         {
             // Based on Blenders axis. Z up, Y forward.
 
@@ -24,7 +24,7 @@ namespace Volorf.ObjExporter
             new Vector3(1f, 1f, -1f)
         };
 
-        private List<Vector3> _normals = new List<Vector3>()
+        private Vector3[] _normals = new Vector3[]
         {
             new Vector3(-1f, 0f, 0f),
             new Vector3(0f, 1f, 0f),
@@ -34,7 +34,7 @@ namespace Volorf.ObjExporter
             new Vector3(0f, 0f, -1f)
         };
 
-        private List<Vector2> _uvs = new List<Vector2>()
+        private Vector2[] _uvs = new Vector2[]
         {
             new Vector2(1f, 0f),
             new Vector2(0f, 0f),
@@ -58,7 +58,7 @@ namespace Volorf.ObjExporter
         }
 
         public void Export(string pathWithDirectory, string appName, string appVersion, string sketchName,
-            List<Vector3> positions, List<Vector3> colors, float voxelSize)
+            Vector3[] positions, Vector3[] colors, float voxelSize)
         {
             Clear();
             AddComment(ref _objData, appName);
@@ -77,26 +77,26 @@ namespace Volorf.ObjExporter
             WriteFile(pathWithSketchDir, sketchName + ".mtl", _mtlData);
         }
 
-        private void Generate(List<Vector3> positions, List<Vector3> colors, float voxelSize)
+        private void Generate(Vector3[] positions, Vector3[] colors, float voxelSize)
         {
             _colorPalette.Clear();
             int colorCount = 0;
 
-            for (int i = 0; i < positions.Count; i++)
+            for (int i = 0; i < positions.Length; i++)
             {
                 _objData += GetObjectTitle("Cube " + i);
 
-                for (int j = 0; j < _points.Count; j++)
+                for (int j = 0; j < _points.Length; j++)
                 {
                     _objData += GetVertex(positions[i] * voxelSize * 2 + _points[j] * voxelSize);
                 }
 
-                for (int m = 0; m < _uvs.Count; m++)
+                for (int m = 0; m < _uvs.Length; m++)
                 {
                     _objData += GetUV(_uvs[m]);
                 }
 
-                for (int k = 0; k < _normals.Count; k++)
+                for (int k = 0; k < _normals.Length; k++)
                 {
                     _objData += GetNormal(_normals[k]);
                 }
