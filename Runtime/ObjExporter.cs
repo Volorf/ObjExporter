@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace Volorf.ObjExporter
 {
     public class ObjExporter
     {
-        private Vector3[] _points = new Vector3[]
+        Vector3[] _points = new Vector3[]
         {
             // Based on Blenders axis. Z up, Y forward.
 
@@ -24,30 +25,28 @@ namespace Volorf.ObjExporter
             new Vector3(1f, 1f, -1f)
         };
 
-        private Vector3[] _normals = new Vector3[]
-        {
-            new Vector3(-1f, 0f, 0f),
-            new Vector3(0f, 1f, 0f),
-            new Vector3(1f, 0f, 0f),
-            new Vector3(0f, -1f, 0f),
-            new Vector3(0f, 0f, 1f),
-            new Vector3(0f, 0f, -1f)
+        Vector3[] _normals = {
+            new (-1f, 0f, 0f),
+            new (0f, 1f, 0f),
+            new (1f, 0f, 0f),
+            new (0f, -1f, 0f),
+            new (0f, 0f, 1f),
+            new (0f, 0f, -1f)
         };
 
-        private Vector2[] _uvs = new Vector2[]
-        {
-            new Vector2(1f, 0f),
-            new Vector2(0f, 0f),
-            new Vector2(0f, 1f),
-            new Vector2(1f, 1f)
+        Vector2[] _uvs = {
+            new (1f, 0f),
+            new (0f, 0f),
+            new (0f, 1f),
+            new (1f, 1f)
         };
 
-        private string _objData;
-        private string _mtlData;
+        string _objData;
+        string _mtlData;
 
-        private Hashtable _colorPalette = new Hashtable();
+        Hashtable _colorPalette = new Hashtable();
 
-        private void AddComment(ref string data, string c)
+        void AddComment(ref string data, string c)
         {
             data += "# " + c + "\n";
         }
@@ -64,23 +63,35 @@ namespace Volorf.ObjExporter
             string sketchName,
             Vector3[] positions, 
             Vector3[] colors, 
-            float voxelSize)
+            float voxelSize,
+            Action onSuccess,
+            Action onFailure
+            )
         {
-            Clear();
-            AddComment(ref _objData, appName);
-            AddComment(ref _objData, appVersion);
+            try
+            {
+                Clear();
+                AddComment(ref _objData, appName);
+                AddComment(ref _objData, appVersion);
 
-            AddLine(ref _objData, "mtllib " + sketchName + ".mtl");
+                AddLine(ref _objData, "mtllib " + sketchName + ".mtl");
 
-            Generate(positions, colors, voxelSize);
+                Generate(positions, colors, voxelSize);
 
-            // Debug.Log(_objData);
-            // Debug.Log(pathWithDirectory);
+                // Debug.Log(_objData);
+                // Debug.Log(pathWithDirectory);
 
-            string pathWithSketchDir = pathWithDirectory + "/" + sketchName;
+                string pathWithSketchDir = pathWithDirectory + "/" + sketchName;
 
-            await WriteFileAsync(pathWithSketchDir, sketchName + ".obj", _objData);
-            await WriteFileAsync(pathWithSketchDir, sketchName + ".mtl", _mtlData);
+                await WriteFileAsync(pathWithSketchDir, sketchName + ".obj", _objData);
+                await WriteFileAsync(pathWithSketchDir, sketchName + ".mtl", _mtlData);
+                
+                onSuccess();
+            }
+            catch
+            {
+                onFailure();
+            }
         }
 
         private void Generate(Vector3[] positions, Vector3[] colors, float voxelSize)
