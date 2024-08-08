@@ -135,13 +135,13 @@ namespace Volorf.ObjExporter
                     AddLine(ref _mtlData, $"Kd {colors[i].x} {colors[i].y} {colors[i].z}");
                     AddLine(ref _mtlData, "Ks 0.5 0.5 0.5");
                     AddLine(ref _mtlData, "Ke 0.0 0.0 0.0");
-                    AddLine(ref _mtlData, "Ni 1.45");
+                    AddLine(ref _mtlData, "Ni 1.0");
                     AddLine(ref _mtlData, "d 1.0");
                     AddLine(ref _mtlData, "illum 2");
                     AddLine(ref _mtlData, "");
                 }
 
-                AddLine(ref _objData, "s off");
+                AddLine(ref _objData, "s 0");
 
                 _objData += GetFaces(i);
             }
