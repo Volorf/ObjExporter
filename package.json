@@ -1,6 +1,6 @@
 {
   "name": "com.volorf.obj-exporter",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "displayName": "Obj Exporter",
   "description": "Exports .obj for voxel data",
   "unity": "2019.4",
@@ -13,7 +13,6 @@
   ],
   "author": {
     "name": "Oleg Frolov",
-    "email": "olegfrolovdesign@gmail.com",
     "url": "https://www.olegfrolov.design"
   }
 }

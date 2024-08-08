@@ -1,6 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Volorf.ObjExporter
@@ -57,8 +57,14 @@ namespace Volorf.ObjExporter
             data += l + "\n";
         }
 
-        public void Export(string pathWithDirectory, string appName, string appVersion, string sketchName,
-            Vector3[] positions, Vector3[] colors, float voxelSize)
+        public async Task ExportAsync(
+            string pathWithDirectory, 
+            string appName, 
+            string appVersion, 
+            string sketchName,
+            Vector3[] positions, 
+            Vector3[] colors, 
+            float voxelSize)
         {
             Clear();
             AddComment(ref _objData, appName);
@@ -68,13 +74,13 @@ namespace Volorf.ObjExporter
 
             Generate(positions, colors, voxelSize);
 
-            Debug.Log(_objData);
-            Debug.Log(pathWithDirectory);
+            // Debug.Log(_objData);
+            // Debug.Log(pathWithDirectory);
 
             string pathWithSketchDir = pathWithDirectory + "/" + sketchName;
 
-            WriteFile(pathWithSketchDir, sketchName + ".obj", _objData);
-            WriteFile(pathWithSketchDir, sketchName + ".mtl", _mtlData);
+            await WriteFileAsync(pathWithSketchDir, sketchName + ".obj", _objData);
+            await WriteFileAsync(pathWithSketchDir, sketchName + ".mtl", _mtlData);
         }
 
         private void Generate(Vector3[] positions, Vector3[] colors, float voxelSize)
@@ -122,7 +128,6 @@ namespace Volorf.ObjExporter
                     AddLine(ref _mtlData, "d 1.0");
                     AddLine(ref _mtlData, "illum 2");
                     AddLine(ref _mtlData, "");
-
                 }
 
                 AddLine(ref _objData, "s off");
@@ -130,8 +135,7 @@ namespace Volorf.ObjExporter
                 _objData += GetFaces(i);
             }
         }
-
-
+        
         private string GetObjectTitle(string t)
         {
             return "o " + t + "\n";
@@ -227,17 +231,15 @@ namespace Volorf.ObjExporter
             _mtlData = "";
         }
 
-        private void WriteFile(string pathWithSketchDir, string fileNameWithExtention, string data)
+        private async Task WriteFileAsync(string pathWithSketchDir, string fileNameWithExtention, string data)
         {
             if (!Directory.Exists(pathWithSketchDir))
             {
                 Directory.CreateDirectory(pathWithSketchDir);
             }
 
-            ;
-
             string filePath = pathWithSketchDir + "/" + fileNameWithExtention;
-            File.WriteAllText(filePath, data);
+            await File.WriteAllTextAsync(filePath, data);
         }
     }
 }
