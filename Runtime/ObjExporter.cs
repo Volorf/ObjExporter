@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -41,19 +42,19 @@ namespace Volorf.ObjExporter
             new (1f, 1f)
         };
 
-        string _objData;
-        string _mtlData;
+        StringBuilder _objData = new StringBuilder();
+        StringBuilder _mtlData = new StringBuilder();
 
         Hashtable _colorPalette = new Hashtable();
 
-        void AddComment(ref string data, string c)
+        void AddComment(StringBuilder data, string c)
         {
-            data += "# " + c + "\n";
+            data.Append("# " + c + "\n");
         }
 
-        private void AddLine(ref string data, string l)
+        private void AddLine(StringBuilder data, string l)
         {
-            data += l + "\n";
+            data.Append(l + "\n");
         }
 
         public async Task ExportAsync(
@@ -71,25 +72,26 @@ namespace Volorf.ObjExporter
             try
             {
                 Clear();
-                AddComment(ref _objData, appName);
-                AddComment(ref _objData, appVersion);
+                AddComment(_objData, appName);
+                AddComment(_objData, appVersion);
 
-                AddLine(ref _objData, "mtllib " + sketchName + ".mtl");
+                AddLine(_objData, "mtllib " + sketchName + ".mtl");
 
-                Generate(positions, colors, voxelSize);
+                await Task.Run(() => Generate(positions, colors, voxelSize));
 
                 // Debug.Log(_objData);
                 // Debug.Log(pathWithDirectory);
 
                 string pathWithSketchDir = pathWithDirectory + "/" + sketchName;
 
-                await WriteFileAsync(pathWithSketchDir, sketchName + ".obj", _objData);
-                await WriteFileAsync(pathWithSketchDir, sketchName + ".mtl", _mtlData);
+                await WriteFileAsync(pathWithSketchDir, sketchName + ".obj", _objData.ToString());
+                await WriteFileAsync(pathWithSketchDir, sketchName + ".mtl", _mtlData.ToString());
                 
                 onSuccess();
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogError("Export failed: " + e.Message);
                 onFailure();
             }
         }
@@ -101,49 +103,49 @@ namespace Volorf.ObjExporter
 
             for (int i = 0; i < positions.Length; i++)
             {
-                _objData += GetObjectTitle("Cube " + i);
+                _objData.Append(GetObjectTitle("Cube " + i));
 
                 for (int j = 0; j < _points.Length; j++)
                 {
-                    _objData += GetVertex(positions[i] * 2 + _points[j] * voxelSize);
+                    _objData.Append(GetVertex(positions[i] * 2 + _points[j] * voxelSize));
                 }
 
                 for (int m = 0; m < _uvs.Length; m++)
                 {
-                    _objData += GetUV(_uvs[m]);
+                    _objData.Append(GetUV(_uvs[m]));
                 }
 
                 for (int k = 0; k < _normals.Length; k++)
                 {
-                    _objData += GetNormal(_normals[k]);
+                    _objData.Append(GetNormal(_normals[k]));
                 }
 
                 if (_colorPalette.ContainsKey(colors[i]))
                 {
-                    AddLine(ref _objData, "usemtl " + _colorPalette[colors[i]]);
+                    AddLine(_objData, "usemtl " + _colorPalette[colors[i]]);
                 }
                 else
                 {
                     colorCount++;
                     _colorPalette.Add(colors[i], colorCount);
-                    AddLine(ref _objData, "usemtl " + colorCount);
+                    AddLine(_objData, "usemtl " + colorCount);
 
                     // Fill .mtl data
-                    AddLine(ref _mtlData, "newmtl " + colorCount);
-                    AddLine(ref _mtlData, "Ns 250.0");
-                    AddLine(ref _mtlData, "Ka 1.0 1.0 1.0");
-                    AddLine(ref _mtlData, $"Kd {colors[i].x} {colors[i].y} {colors[i].z}");
-                    AddLine(ref _mtlData, "Ks 0.5 0.5 0.5");
-                    AddLine(ref _mtlData, "Ke 0.0 0.0 0.0");
-                    AddLine(ref _mtlData, "Ni 1.0");
-                    AddLine(ref _mtlData, "d 1.0");
-                    AddLine(ref _mtlData, "illum 2");
-                    AddLine(ref _mtlData, "");
+                    AddLine(_mtlData, "newmtl " + colorCount);
+                    AddLine(_mtlData, "Ns 250.0");
+                    AddLine(_mtlData, "Ka 1.0 1.0 1.0");
+                    AddLine(_mtlData, $"Kd {colors[i].x} {colors[i].y} {colors[i].z}");
+                    AddLine(_mtlData, "Ks 0.5 0.5 0.5");
+                    AddLine(_mtlData, "Ke 0.0 0.0 0.0");
+                    AddLine(_mtlData, "Ni 1.0");
+                    AddLine(_mtlData, "d 1.0");
+                    AddLine(_mtlData, "illum 2");
+                    AddLine(_mtlData, "");
                 }
 
-                AddLine(ref _objData, "s 0");
+                AddLine(_objData, "s 0");
 
-                _objData += GetFaces(i);
+                _objData.Append(GetFaces(i));
             }
         }
         
@@ -238,8 +240,8 @@ namespace Volorf.ObjExporter
 
         private void Clear()
         {
-            _objData = "";
-            _mtlData = "";
+            _objData.Clear();
+            _mtlData.Clear();
         }
 
         private async Task WriteFileAsync(string pathWithSketchDir, string fileNameWithExtention, string data)
