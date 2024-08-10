@@ -9,8 +9,6 @@ namespace Volorf.ObjExporter
 {
     public class ObjExporter
     {
-        public bool convertToLinear = true;
-        
         Vector3[] _points = new Vector3[]
         {
             // Based on Blenders axis. Z up, Y forward.
@@ -129,17 +127,14 @@ namespace Volorf.ObjExporter
                 else
                 {
                     colorCount++;
-                    
-                    Vector3 calcColor = convertToLinear ? ConvertToLinear(colors[i]) : colors[i];
-                    
-                    _colorPalette.Add(calcColor, colorCount);
+                    _colorPalette.Add(colors[i], colorCount);
                     AddLine(_objData, "usemtl " + colorCount);
 
                     // Fill .mtl data
                     AddLine(_mtlData, "newmtl " + colorCount);
                     AddLine(_mtlData, "Ns 250.0");
                     AddLine(_mtlData, "Ka 1.0 1.0 1.0");
-                    AddLine(_mtlData, $"Kd {calcColor.x} {calcColor.y} {calcColor.z}");
+                    AddLine(_mtlData, $"Kd {colors[i].x} {colors[i].y} {colors[i].z}");
                     AddLine(_mtlData, "Ks 0.5 0.5 0.5");
                     AddLine(_mtlData, "Ke 0.0 0.0 0.0");
                     AddLine(_mtlData, "Ni 1.0");
@@ -258,11 +253,6 @@ namespace Volorf.ObjExporter
 
             string filePath = pathWithSketchDir + "/" + fileNameWithExtention;
             await File.WriteAllTextAsync(filePath, data);
-        }
-        
-        Vector3 ConvertToLinear(Vector3 color)
-        {
-            return new Vector3(Mathf.GammaToLinearSpace(color.x), Mathf.GammaToLinearSpace(color.y), Mathf.GammaToLinearSpace(color.z));
         }
     }
 }
